@@ -1,0 +1,56 @@
+---
+title: "Times series forecasting"
+subtitle: "Varicella data"
+author: "Julien JACQUES"
+output: pdf_document
+---
+
+We start by loading necessary package
+```{r}
+library(forecast)
+library(ggplot2)
+```
+
+
+We load the data and plot them
+```{r, out.width='70%'}
+data=read.csv(file="http://eric.univ-lyon2.fr/~jjacques/Download/DataSet/varicelle.csv")
+varicelle<-ts(data$x,start=c(1931,1),end=c(1972,6),freq=12)
+plot(varicelle)
+```
+
+It seems to be a seasonal pattern. We can check this with the seasonplo
+
+
+The mean is given by
+```{r}
+mean(varicelle)
+```
+
+And the auto-correlation mean that there is a seasonal pattern in the data
+```{r, out.width='70%'}
+tmp=acf(varicelle,type="cor",plot = FALSE)
+tmp$acf[1:3,1,1]
+plot(tmp)
+```
+
+What is confirmed by the seasonal plot
+
+```{r, out.width='70%', warning=FALSE}
+ggseasonplot(varicelle,year.labels= TRUE,year.labels.left=TRUE)
+```
+
+We can also plot manually the seasonal plot
+
+```{r, out.width='70%'}
+plot(varicelle[1:12],type="l",ylim=c(min(varicelle),max(varicelle)))
+for (i in 1:41) lines(varicelle[(1+12*i):(12*(i+1))])
+```
+
+We now compute and plot the annual evolution
+```{r, out.width='70%'}
+x=rep(0,41)
+for (i in 0:40) x[i+1]<-sum(varicelle[(1+12*i):(12*(i+1))])
+plot(x,type='l',xaxt='n',xlab='')
+axis(1,at = 0:40,labels = 1931:1971)
+```
